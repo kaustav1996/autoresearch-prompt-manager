@@ -107,7 +107,6 @@ async def pick_arm_thompson(
     """
     from prompt_manager.api.db import metrics_repo
 
-    threshold = 6.0  # Scores >= 6 count as "success"
     best_arm = arms[0]
     best_sample = -1.0
 

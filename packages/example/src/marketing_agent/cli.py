@@ -109,11 +109,10 @@ async def _seed() -> None:
 
 
 async def _run(task: str) -> None:
-    from prompt_manager.client import PromptManagerClient
-    from shonku import LLMConfig
-
     from marketing_agent.agent import MarketingContentAgent
     from marketing_agent.tools import create_prompt_manager_tools
+    from prompt_manager.client import PromptManagerClient
+    from shonku import LLMConfig
 
     cfg = _get_config()
     if not cfg["llm_api_key"]:
@@ -134,7 +133,10 @@ async def _run(task: str) -> None:
     print()
 
     result = await agent.run(
-        input=f"{task}. Use resolve_prompt to get a template, rate_content to score, report_metric to log.",
+        input=(
+            f"{task}. Use resolve_prompt to get a template, "
+            "rate_content to score, report_metric to log."
+        ),
         llm_config=llm_config,
         tools=tools,
     )
@@ -167,7 +169,7 @@ async def _status() -> None:
             print(f"API key: {'set' if cfg['llm_api_key'] else 'NOT SET'}")
     except Exception as e:
         print(f"Cannot connect to API: {e}")
-        print(f"  Is the API running? Try: arpm-api start")
+        print("  Is the API running? Try: arpm-api start")
         sys.exit(1)
 
 

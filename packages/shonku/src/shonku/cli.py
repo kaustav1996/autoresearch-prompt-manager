@@ -9,7 +9,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -179,9 +178,9 @@ def cmd_init(args: argparse.Namespace) -> None:
     print(f"Scaffolded shonku agent project: {name}")
     print(f"  {root}/")
     print(f"    src/{module_name}/agent.py    <- your agent")
-    print(f"    tests/test_agent.py           <- tests")
-    print(f"    pyproject.toml                <- package config")
-    print(f"    README.md")
+    print("    tests/test_agent.py           <- tests")
+    print("    pyproject.toml                <- package config")
+    print("    README.md")
     print()
     print("Next steps:")
     print(f"  cd {name}")

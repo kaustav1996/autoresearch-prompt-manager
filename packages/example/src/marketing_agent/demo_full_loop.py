@@ -1,5 +1,5 @@
 """
-Full Loop Demo: Multi-version prompts → Experiment routing → Agent ratings → Autoresearcher optimization
+Full Loop Demo: Multi-version prompts, experiment routing, autoresearcher optimization
 
 This script demonstrates the complete autoresearch-prompt-manager stack:
 
@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-
 import os
 
 import httpx
@@ -219,7 +218,7 @@ async def run_autoresearcher(
     async def get_sample_interactions(
         prompt_id: str, limit: str = "3"
     ) -> str:
-        resp = await api.get(f"/prompts/welcome-demo/versions")
+        resp = await api.get("/prompts/welcome-demo/versions")
         versions = resp.json()
         samples = []
         for v in versions:
@@ -346,9 +345,6 @@ async def verify_new_routing(
     print("\n" + "=" * 60)
     print("STEP 6: Verify new routing includes optimized version")
     print("=" * 60)
-
-    tools = create_prompt_manager_tools(client)
-    agent = MarketingContentAgent()
 
     versions_seen = set()
     for i in range(6):
