@@ -59,9 +59,14 @@ autoresearcher = [
     "autoresearcher-shonku>=0.1.0",
 ]
 
+# Example marketing agent
+example = [
+    "marketing-agent-example>=0.1.0",
+]
+
 # Everything
 all = [
-    "autoresearch-prompt-manager[api,client,metric,mcp,shonku,autoresearcher]",
+    "autoresearch-prompt-manager[api,client,metric,mcp,shonku,autoresearcher,example]",
 ]
 
 # Development
