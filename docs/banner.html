@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1280px;
+    height: 640px;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .glow-1 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+    top: -100px; left: -50px;
+    border-radius: 50%;
+  }
+
+  .glow-2 {
+    position: absolute;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+    bottom: -80px; right: 100px;
+    border-radius: 50%;
+  }
+
+  .glow-3 {
+    position: absolute;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
+    top: 100px; right: -30px;
+    border-radius: 50%;
+  }
+
+  .content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .title span.auto { color: #818cf8; }
+  .title span.research { color: #a78bfa; }
+  .title span.prompt { color: #c084fc; }
+
+  .subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+    margin-bottom: 32px;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  .stack {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .stack-item {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 18px;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    backdrop-filter: blur(10px);
+  }
+
+  .stack-item.highlight {
+    border-color: rgba(129, 140, 248, 0.5);
+    background: rgba(129, 140, 248, 0.12);
+    color: #c7d2fe;
+  }
+
+  .arrow {
+    color: rgba(255,255,255,0.3);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+  }
+
+  .features {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .feature {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .feature .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #818cf8;
+  }
+
+  .feature .dot.green { background: #34d399; }
+  .feature .dot.purple { background: #a78bfa; }
+  .feature .dot.cyan { background: #22d3ee; }
+  .feature .dot.orange { background: #fb923c; }
+
+  .tagline {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .badge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 4px 14px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="glow-3"></div>
+
+  <div class="content">
+    <div class="title">
+      <span class="auto">auto</span><span class="research">research</span>-<span class="prompt">prompt</span>-manager
+    </div>
+    <div class="subtitle">
+      Prompts are code. Version them, experiment with them, measure them,<br>
+      and let an LLM make them better. Automatically.
+    </div>
+
+    <div class="stack">
+      <div class="stack-item">your app</div>
+      <div class="arrow">&rarr;</div>
+      <div class="stack-item highlight">prompt-manager</div>
+      <div class="arrow">&rarr;</div>
+      <div class="stack-item highlight">autoresearcher</div>
+      <div class="arrow">&rarr;</div>
+      <div class="stack-item">shonku</div>
+      <div class="arrow">&rarr;</div>
+      <div class="stack-item">agno</div>
+    </div>
+
+    <div class="features">
+      <div class="feature"><div class="dot"></div>Versioned Prompts</div>
+      <div class="feature"><div class="dot green"></div>A/B Experiments</div>
+      <div class="feature"><div class="dot purple"></div>Thompson Sampling</div>
+      <div class="feature"><div class="dot cyan"></div>Autoresearch Loop</div>
+      <div class="feature"><div class="dot orange"></div>Agent Framework</div>
+    </div>
+
+    <div class="tagline">
+      "propose, test, keep or discard" &mdash; applied to prompts
+    </div>
+
+    <div class="badges">
+      <div class="badge">pip install autoresearch-prompt-manager</div>
+      <div class="badge">shonku init my-agent</div>
+      <div class="badge">built on agno</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,16 +1,6 @@
 <div align="center">
 
-```
-   ___         __        ___                            __
-  / _ | __ __ / /_ ___  / _ \ ___   ___ ___  ___ _ __ / /_
- / __ |/ // // __// _ \/ , _// -_) (_-</ -_)/ _ `// __/ __/
-/_/ |_|\_,_/ \__/ \___/_/|_| \__/ /___/\__/ \_,_//_/  \__/
-   ___                       __    __  ___
-  / _ \ _______ __ _  ___   / /_  /  |/  /___ _ ___  ___ _ ___ _ ___  ____
- / ___// __/ _ \  ' \/ _ \ / __/ / /|_/ // _ `// _ \/ _ `// _ `// -_)/ __/
-/_/   /_/  \___/_/_/_/ .__/ \__/ /_/  /_/ \_,_//_//_/\_,_/ \_, / \__//_/
-                     /_/                                   /___/
-```
+<img src="docs/banner.png" alt="autoresearch-prompt-manager" width="100%">
 
 # autoresearch-prompt-manager
 
@@ -95,6 +85,8 @@ arpm-api up
 
 # 2. Configure
 export PM_DATABASE_URL=postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager
+export PM_LLM_PROVIDER=groq              # or: anthropic, openai, gemini, openrouter
+export PM_LLM_MODEL=openai/gpt-oss-120b  # or: claude-sonnet-4-20250514, gpt-4o, etc.
 export PM_LLM_API_KEY=your-api-key
 
 # 3. Start the API
