@@ -1,4 +1,9 @@
-"""Bridge to agno.  This is the ONLY file that imports agno."""
+"""Bridge to agno — the ONLY file that imports agno.
+
+agno (https://agno.com) provides the production-grade agent runtime,
+LLM provider integrations, and tool execution. shonku delegates all
+agent execution to agno via this bridge.
+"""
 
 from __future__ import annotations
 

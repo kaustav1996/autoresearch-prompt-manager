@@ -96,6 +96,8 @@ result = await WeatherAgent().run(
 
 ## Supported LLM providers
 
+All providers supported by [agno](https://docs.agno.com) work out of the box:
+
 | Provider | Config |
 |----------|--------|
 | Anthropic (Claude) | `provider="anthropic"` |
@@ -103,6 +105,18 @@ result = await WeatherAgent().run(
 | Groq | `provider="groq"` |
 | Google Gemini | `provider="gemini"` |
 | OpenRouter | `provider="openrouter"` |
+
+## Built on agno
+
+shonku is a thin, opinionated layer on top of [agno](https://docs.agno.com) (the open-source agent framework by [Agno](https://agno.com)). agno provides the production-grade agent runtime, LLM provider integrations, and [AgentOS](https://docs.agno.com/agent-os/introduction) for deploying agents at scale. shonku adds:
+
+- Declarative agent definitions with `@tool` decorators
+- Runtime tool injection (caller passes tools, agent doesn't hardcode them)
+- Required tool validation
+- `shonku init` scaffolding for publishable PyPI packages
+- A single-file bridge (`bridge.py`) so agent code never imports agno directly
+
+If you need the full agent runtime directly, use agno: `pip install agno`
 
 ## Part of autoresearch-prompt-manager
 
@@ -112,7 +126,7 @@ shonku is the agent framework layer in the [autoresearch-prompt-manager](https:/
 autoresearch-prompt-manager  (prompt CRUD, experiments, metrics)
   -> autoresearcher-shonku   (optimization agents)
   -> shonku                  (this package -- agent framework)
-  -> agno                    (runtime)
+  -> agno                    (runtime -- https://agno.com)
 ```
 
 Install via the parent package: `pip install autoresearch-prompt-manager[shonku]`

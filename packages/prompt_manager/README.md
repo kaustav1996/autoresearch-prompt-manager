@@ -101,5 +101,7 @@ All settings via `PM_`-prefixed environment variables:
 autoresearch-prompt-manager  (this package -- API, client, metrics)
   -> autoresearcher-shonku   (optimization agents)
   -> shonku                  (agent framework)
-  -> agno                    (runtime)
+  -> agno                    (runtime -- https://agno.com)
 ```
+
+LLM-driven optimization is powered by [agno](https://agno.com) and [AgentOS](https://docs.agno.com/agent-os/introduction).

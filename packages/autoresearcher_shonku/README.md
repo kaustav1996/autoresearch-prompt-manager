@@ -81,13 +81,18 @@ config = AutoResearcherConfig(
 )
 ```
 
+## Acknowledgements
+
+- Optimization loop inspired by Karpathy's [autoresearch](https://github.com/karpathy/autoresearch)
+- Agent execution powered by [agno](https://agno.com) and [AgentOS](https://docs.agno.com/agent-os/introduction)
+
 ## Part of autoresearch-prompt-manager
 
 ```
 autoresearch-prompt-manager  (prompt CRUD, experiments, metrics)
   -> autoresearcher-shonku   (this package -- optimization agents)
   -> shonku                  (agent framework)
-  -> agno                    (runtime)
+  -> agno                    (runtime -- https://agno.com)
 ```
 
 Install via the parent package: `pip install autoresearch-prompt-manager[autoresearcher]`
