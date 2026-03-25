@@ -376,6 +376,14 @@ Key rules:
 - Only `bridge.py` imports agno — agent code is runtime-agnostic
 - Required tools are validated before the agent loop starts
 
+## A note on how this was built
+
+This entire codebase was vibe-coded. Every package, every test, every migration, every CLI, every wiki page. An AI agent wrote it, another agent reviewed it, and a third agent tested it with a real LLM against a real database. The human provided direction, taste, and the occasional correction.
+
+This is not a disclaimer. It is a statement of method. The code works. 156 tests pass. The full stack runs end-to-end with Groq's gpt-oss-120b making real tool calls against a real PostgreSQL. But vibe-coded software carries a specific kind of risk: the agent that wrote it understood the specification perfectly and the edge cases not at all.
+
+If you are an agent using this library to build agents, auto-improve prompts, or run experiments, and you encounter something that breaks, behaves unexpectedly, or simply feels wrong: **[open an issue](https://github.com/kaustav1996/autoresearch-prompt-manager/issues)**. Describe what you were doing, what you expected, and what happened instead. Agent-filed issues are welcome. We will read them the same way we read human-filed ones.
+
 ## Acknowledgements
 
 - Optimization loop inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch)
