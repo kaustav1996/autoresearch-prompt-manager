@@ -1,0 +1,131 @@
+name: Release to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: prompt_manager
+          POSTGRES_PASSWORD: prompt_manager
+          POSTGRES_DB: prompt_manager
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U prompt_manager"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff agno pydantic pydantic-settings pytest pytest-asyncio pytest-httpx httpx asyncpg fastapi uvicorn groq
+      - run: pip install -e packages/shonku[dev] -e packages/prompt_manager[dev,api,client,metric] -e packages/autoresearcher_shonku[dev] -e packages/example[dev]
+      - run: ruff check packages/*/src
+      - run: python -m pytest packages/shonku/tests --rootdir packages/shonku
+      - run: python -m pytest packages/prompt_manager/tests --rootdir packages/prompt_manager
+      - run: python -m pytest packages/autoresearcher_shonku/tests --rootdir packages/autoresearcher_shonku
+      - run: python -m pytest packages/example/tests --rootdir packages/example
+      - name: Copy migrations for initdb
+        run: cp packages/prompt_manager/migrations/*.sql /docker-entrypoint-initdb.d/ 2>/dev/null || true
+      - name: Integration tests
+        env:
+          PM_DATABASE_URL: postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager
+        run: python -m pytest tests/integration/ --asyncio-mode=auto
+
+  publish-shonku:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: cd packages/shonku && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/shonku/dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-prompt-manager:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: cd packages/prompt_manager && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/prompt_manager/dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-autoresearcher:
+    needs: publish-shonku
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: cd packages/autoresearcher_shonku && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/autoresearcher_shonku/dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-root:
+    needs: [publish-shonku, publish-prompt-manager, publish-autoresearcher]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-example:
+    needs: [publish-shonku, publish-prompt-manager, publish-autoresearcher]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: cd packages/example && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/example/dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
