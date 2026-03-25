@@ -126,6 +126,56 @@ from {module_name}.agent import {class_name}
 __all__ = ["{class_name}"]
 '''
 
+CI_TEMPLATE = '''name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest tests/ -v
+'''
+
+RELEASE_TEMPLATE = '''name: Publish to PyPI
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest tests/ -v
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{{{ secrets.PYPI_API_TOKEN }}}}
+'''
+
 
 def _to_class_name(name: str) -> str:
     """Convert 'my-cool-agent' to 'MyCoolAgent'."""
@@ -175,11 +225,19 @@ def cmd_init(args: argparse.Namespace) -> None:
     (root / "pyproject.toml").write_text(PYPROJECT_TEMPLATE.format(**ctx))
     (root / "README.md").write_text(README_TEMPLATE.format(**ctx))
 
+    # GitHub Actions CI + release pipelines
+    workflows = root / ".github" / "workflows"
+    workflows.mkdir(parents=True, exist_ok=True)
+    (workflows / "ci.yml").write_text(CI_TEMPLATE)
+    (workflows / "release.yml").write_text(RELEASE_TEMPLATE)
+
     print(f"Scaffolded shonku agent project: {name}")
     print(f"  {root}/")
-    print(f"    src/{module_name}/agent.py    <- your agent")
-    print("    tests/test_agent.py           <- tests")
-    print("    pyproject.toml                <- package config")
+    print(f"    src/{module_name}/agent.py              <- your agent")
+    print("    tests/test_agent.py                     <- tests")
+    print("    pyproject.toml                          <- package config")
+    print("    .github/workflows/ci.yml                <- CI on push")
+    print("    .github/workflows/release.yml           <- publish on tag")
     print("    README.md")
     print()
     print("Next steps:")
@@ -187,7 +245,11 @@ def cmd_init(args: argparse.Namespace) -> None:
     print("  pip install -e '.[dev]'")
     print("  pytest")
     print()
-    print(f"Edit src/{module_name}/agent.py to build your agent.")
+    print("To publish to PyPI:")
+    print("  1. Create a GitHub repo")
+    print("  2. Add PYPI_API_TOKEN secret (Settings > Secrets > Actions)")
+    print("  3. Create 'pypi' environment (Settings > Environments)")
+    print("  4. git tag v0.1.0 && git push --tags")
 
 
 def cmd_list(args: argparse.Namespace) -> None:

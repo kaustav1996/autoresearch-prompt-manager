@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "autoresearch-prompt-manager"
-version = "0.1.2"
+version = "0.1.3"
 description = "Versioned prompt CRUD, A/B experiments, metrics, and LLM optimization API"
 readme = "README.md"
 license = "MIT"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "marketing-agent-example"
-version = "0.1.4"
+version = "0.1.5"
 description = "Example marketing content agent demonstrating the full prompt-manager stack"
 readme = "README.md"
 license = "MIT"

@@ -38,19 +38,23 @@ from shonku import ShonkuAgent, tool, LLMConfig
 
 class MyAgent(ShonkuAgent):
     name = "my-agent"
-    instructions = "You are a helpful assistant."
+    instructions = "You are a helpful assistant. Use tools when needed."
     required_tools = ["search"]  # caller must provide this
 
     @tool(description="Calculate a math expression")
     def calculate(self, expression: str) -> str:
         return str(eval(expression))
 
+# Caller provides the external tool
+def search(query: str) -> str:
+    return f"Results for: {query}"
+
 # Run with external tools + LLM creds passed at runtime
 agent = MyAgent()
 result = await agent.run(
-    input="What is 42 * 17?",
-    llm_config=LLMConfig(provider="groq", model="llama-3.3-70b-versatile", api_key="..."),
-    tools=[search_tool],  # external tool passed by caller
+    input="Search for Python frameworks, then calculate 42 * 17",
+    llm_config=LLMConfig(provider="groq", model="openai/gpt-oss-120b", api_key="..."),
+    tools=[ToolSpec(name="search", description="Search the web", callable=search)],
 )
 print(result.content)
 ```
@@ -65,8 +69,17 @@ print(result.content)
 
 ## Publish agents as PyPI packages
 
+### 1. Scaffold
+
+```bash
+shonku init my-weather-agent
+cd my-weather-agent
+```
+
+### 2. Build your agent
+
 ```python
-# myagent/agent.py
+# src/my_weather_agent/agent.py
 from shonku import ShonkuAgent, tool
 
 class WeatherAgent(ShonkuAgent):
@@ -79,18 +92,52 @@ class WeatherAgent(ShonkuAgent):
         return f"{celsius}C / {float(celsius) * 9/5 + 32:.0f}F"
 ```
 
+### 3. Test locally
+
 ```bash
-pip install myagent  # anyone can install it
+pip install -e ".[dev]"
+pytest
+```
+
+### 4. Set up GitHub + PyPI
+
+Create a GitHub repo and add your PyPI API token:
+
+1. **Get a PyPI token**: https://pypi.org/manage/account/token/
+2. **Add to GitHub**: Repo Settings > Secrets > Actions > `PYPI_API_TOKEN`
+3. **Create environment**: Repo Settings > Environments > create `pypi`
+
+`shonku init` creates `.github/workflows/release.yml` automatically. It runs tests on every push and publishes to PyPI on tags.
+
+### 5. Push and publish
+
+```bash
+git init && git add -A && git commit -m "Initial commit"
+git remote add origin git@github.com:you/my-weather-agent.git
+git push -u origin main
+
+# Publish to PyPI
+git tag v0.1.0 && git push --tags
+```
+
+### 6. Anyone can now use it
+
+```bash
+pip install my-weather-agent
 ```
 
 ```python
-# consumer code
-from myagent import WeatherAgent
+from my_weather_agent import WeatherAgent
+from shonku import LLMConfig
+from shonku.types import ToolSpec
+
+def get_weather(city: str) -> str:
+    return f"22C, sunny in {city}"
 
 result = await WeatherAgent().run(
     input="Weather in Tokyo?",
-    llm_config=my_config,
-    tools=[my_weather_api_tool],
+    llm_config=LLMConfig(provider="groq", model="openai/gpt-oss-120b", api_key="..."),
+    tools=[ToolSpec(name="get_weather", description="Get weather", callable=get_weather)],
 )
 ```
 

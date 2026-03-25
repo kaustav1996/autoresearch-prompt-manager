@@ -33,29 +33,70 @@ pip install autoresearcher-shonku
 
 ## Usage
 
-The autoresearcher does NOT own your data. You pass tools that wrap your storage:
+The autoresearcher does NOT own your data. You pass tools that wrap your storage. This works with any backend, not just autoresearch-prompt-manager.
+
+### Example: optimize email subject lines stored in a CSV
 
 ```python
+import csv
 from autoresearcher_shonku import AutoResearcherAgent
 from shonku import LLMConfig
 from shonku.types import ToolSpec
 
-# Your tools (wrap your API/DB)
+# Your data lives wherever you want. Wrap access as tools.
+subjects = {"welcome": {"body": "Welcome to our service", "version": 1}}
+metrics = [{"quality": 5.2}, {"quality": 4.8}, {"quality": 6.0}]
+
+def get_prompt(slug: str) -> str:
+    import json
+    s = subjects.get(slug, {})
+    return json.dumps({"slug": slug, **s})
+
+def get_metrics(prompt_id: str, version_id: str, metric_name: str = "quality") -> str:
+    import json
+    vals = [m.get(metric_name, 0) for m in metrics]
+    return json.dumps({"count": len(vals), "mean": sum(vals)/len(vals)})
+
+def get_sample_interactions(prompt_id: str, limit: str = "3") -> str:
+    return '[{"feedback": "too generic"}, {"feedback": "boring"}]'
+
+def create_version(slug: str, content: str) -> str:
+    import json
+    subjects[slug] = {"body": content, "version": subjects.get(slug, {}).get("version", 0) + 1}
+    return json.dumps({"version": subjects[slug]["version"]})
+
+def create_experiment(prompt_id: str, baseline_version_id: str, new_version_id: str, weight: str = "10") -> str:
+    return '{"experiment_id": "exp-1", "status": "running"}'
+
+def conclude_experiment(experiment_id: str) -> str:
+    return '{"status": "concluded"}'
+
 tools = [
-    ToolSpec(name="get_prompt", description="...", callable=my_get_prompt),
-    ToolSpec(name="get_metrics", description="...", callable=my_get_metrics),
-    ToolSpec(name="create_version", description="...", callable=my_create_version),
-    ToolSpec(name="create_experiment", description="...", callable=my_create_experiment),
-    ToolSpec(name="conclude_experiment", description="...", callable=my_conclude),
-    ToolSpec(name="get_sample_interactions", description="...", callable=my_samples),
+    ToolSpec(name="get_prompt", description="Get prompt by slug", callable=get_prompt),
+    ToolSpec(name="get_metrics", description="Get metrics", callable=get_metrics),
+    ToolSpec(name="get_sample_interactions", description="Get samples", callable=get_sample_interactions),
+    ToolSpec(name="create_version", description="Create new version", callable=create_version),
+    ToolSpec(name="create_experiment", description="Create experiment", callable=create_experiment),
+    ToolSpec(name="conclude_experiment", description="Conclude experiment", callable=conclude_experiment),
 ]
 
 agent = AutoResearcherAgent()
 result = await agent.run(
-    input="Optimize prompt 'welcome-email'. Quality is 5.2/10, target 7.0+.",
+    input="Optimize 'welcome' subject line. Quality is 5.3/10, target 7.0+.",
     llm_config=LLMConfig(provider="groq", model="openai/gpt-oss-120b", api_key="..."),
     tools=tools,
 )
+print(subjects["welcome"]["body"])  # improved version
+```
+
+### With autoresearch-prompt-manager
+
+When used with the full prompt-manager stack, the tools wrap the API instead of local data:
+
+```bash
+arpm-api up && arpm-api start   # start the API
+arpm-example loop                # run the optimization loop
+```
 ```
 
 ## Safety rails
