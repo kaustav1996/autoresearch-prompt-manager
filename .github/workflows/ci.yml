@@ -95,12 +95,7 @@ jobs:
       - name: Run migrations
         env:
           PM_DATABASE_URL: postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager
-        run: python -c "
-          import asyncio
-          from prompt_manager.api.db.engine import run_migrations
-          from prompt_manager.core.config import PromptManagerSettings
-          asyncio.run(run_migrations(PromptManagerSettings()))
-          "
+        run: python -c "import asyncio; from prompt_manager.api.db.engine import run_migrations; from prompt_manager.core.config import PromptManagerSettings; asyncio.run(run_migrations(PromptManagerSettings()))"
       - name: Integration tests
         env:
           PM_DATABASE_URL: postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager

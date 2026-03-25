@@ -15,10 +15,13 @@
 # autoresearch-prompt-manager
 
 [![CI](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml)
+[![Release](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/release.yml/badge.svg)](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/release.yml)
+[![PyPI](https://img.shields.io/pypi/v/autoresearch-prompt-manager?label=autoresearch-prompt-manager&color=orange)](https://pypi.org/project/autoresearch-prompt-manager/)
 [![PyPI - shonku](https://img.shields.io/pypi/v/shonku?label=shonku&color=blue)](https://pypi.org/project/shonku/)
 [![PyPI - autoresearcher-shonku](https://img.shields.io/pypi/v/autoresearcher-shonku?label=autoresearcher-shonku&color=green)](https://pypi.org/project/autoresearcher-shonku/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
+[![Built on agno](https://img.shields.io/badge/built%20on-agno-purple)](https://agno.com)
 
 **Autonomous prompt management with versioning, A/B experiments, metrics, and LLM-driven optimization.**
 

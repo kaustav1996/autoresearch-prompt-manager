@@ -28,14 +28,16 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install ruff agno pydantic pydantic-settings pytest pytest-asyncio pytest-httpx httpx asyncpg fastapi uvicorn groq
-      - run: pip install -e packages/shonku[dev] -e packages/prompt_manager[dev,api,client,metric] -e packages/autoresearcher_shonku[dev] -e packages/example[dev]
+      - run: pip install -e "packages/shonku[dev]" -e "packages/prompt_manager[dev,api,client,metric]" -e "packages/autoresearcher_shonku[dev]" -e "packages/example[dev]"
       - run: ruff check packages/*/src
       - run: python -m pytest packages/shonku/tests --rootdir packages/shonku
       - run: python -m pytest packages/prompt_manager/tests --rootdir packages/prompt_manager
       - run: python -m pytest packages/autoresearcher_shonku/tests --rootdir packages/autoresearcher_shonku
       - run: python -m pytest packages/example/tests --rootdir packages/example
-      - name: Copy migrations for initdb
-        run: cp packages/prompt_manager/migrations/*.sql /docker-entrypoint-initdb.d/ 2>/dev/null || true
+      - name: Run migrations
+        env:
+          PM_DATABASE_URL: postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager
+        run: python -c "import asyncio; from prompt_manager.api.db.engine import run_migrations; from prompt_manager.core.config import PromptManagerSettings; asyncio.run(run_migrations(PromptManagerSettings()))"
       - name: Integration tests
         env:
           PM_DATABASE_URL: postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager
@@ -58,24 +60,7 @@ jobs:
         with:
           packages-dir: packages/shonku/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}
-
-  publish-arpm:
-    needs: test
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install build
-      - run: cd packages/prompt_manager && python -m build
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: packages/prompt_manager/dist/
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
 
   publish-autoresearcher:
     needs: [publish-shonku]
@@ -94,9 +79,10 @@ jobs:
         with:
           packages-dir: packages/autoresearcher_shonku/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
 
-  publish-root:
-    needs: [publish-shonku, publish-arpm, publish-autoresearcher]
+  publish-prompt-manager:
+    needs: [publish-shonku, publish-autoresearcher]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -107,13 +93,15 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install build
-      - run: python -m build
+      - run: cd packages/prompt_manager && python -m build
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          packages-dir: packages/prompt_manager/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
 
   publish-example:
-    needs: [publish-shonku, publish-arpm, publish-autoresearcher]
+    needs: [publish-shonku, publish-autoresearcher, publish-prompt-manager]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -129,3 +117,4 @@ jobs:
         with:
           packages-dir: packages/example/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
