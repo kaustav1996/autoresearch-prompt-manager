@@ -101,3 +101,53 @@ async def aggregate_by_version(
         )
         for r in rows
     ]
+
+
+async def get_arm_stats(
+    conn: asyncpg.Connection,
+    version_id: UUID,
+    experiment_id: UUID,
+    metric_name: str,
+    threshold: float = 6.0,
+) -> dict:
+    """Get success/failure counts for Thompson Sampling.
+
+    A metric value >= threshold counts as a "success", below as "failure".
+    """
+    row = await conn.fetchrow(
+        """
+        SELECT
+            count(*) FILTER (WHERE metric_value >= $4)::int AS successes,
+            count(*) FILTER (WHERE metric_value < $4)::int AS failures
+        FROM metric_events
+        WHERE version_id = $1
+          AND experiment_id = $2
+          AND metric_name = $3
+        """,
+        version_id,
+        experiment_id,
+        metric_name,
+        threshold,
+    )
+    if row:
+        return {"successes": row["successes"], "failures": row["failures"]}
+    return {"successes": 0, "failures": 0}
+
+
+async def get_recent(
+    conn: asyncpg.Connection,
+    prompt_id: UUID,
+    limit: int = 10,
+) -> list:
+    """Get recent metric events for a prompt."""
+    return await conn.fetch(
+        """
+        SELECT metric_name, metric_value, version_id, created_at
+        FROM metric_events
+        WHERE prompt_id = $1
+        ORDER BY created_at DESC
+        LIMIT $2
+        """,
+        prompt_id,
+        limit,
+    )

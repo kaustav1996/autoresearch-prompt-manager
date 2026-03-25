@@ -88,6 +88,54 @@ def pick_arm_random(arms: list[ExperimentArm]) -> ExperimentArm:
     return random.choices(arms, weights=weights, k=1)[0]
 
 
+# ── Thompson Sampling ────────────────────────────────────────────────────
+
+async def pick_arm_thompson(
+    conn: asyncpg.Connection,
+    arms: list[ExperimentArm],
+    experiment_id: UUID,
+    metric_name: str = "quality_score",
+) -> ExperimentArm:
+    """Thompson Sampling arm selection using Beta distribution.
+
+    For each arm, we model success probability as Beta(alpha, beta) where:
+      alpha = 1 + number of "good" outcomes (metric >= threshold)
+      beta  = 1 + number of "bad" outcomes  (metric < threshold)
+
+    We sample from each arm's posterior and pick the arm with the
+    highest sample — this naturally balances exploration vs exploitation.
+    """
+    from prompt_manager.api.db import metrics_repo
+
+    threshold = 6.0  # Scores >= 6 count as "success"
+    best_arm = arms[0]
+    best_sample = -1.0
+
+    for arm in arms:
+        # Fetch metric counts for this arm's version
+        stats = await metrics_repo.get_arm_stats(
+            conn, arm.version_id, experiment_id, metric_name
+        )
+        successes = stats.get("successes", 0)
+        failures = stats.get("failures", 0)
+
+        # Beta posterior: Beta(1 + successes, 1 + failures)
+        alpha = 1 + successes
+        beta_param = 1 + failures
+        sample = random.betavariate(alpha, beta_param)
+
+        logger.debug(
+            "Thompson: arm=%s alpha=%d beta=%d sample=%.3f",
+            arm.label or arm.id, alpha, beta_param, sample,
+        )
+
+        if sample > best_sample:
+            best_sample = sample
+            best_arm = arm
+
+    return best_arm
+
+
 # ── Valid state transitions ───────────────────────────────────────────────
 
 _VALID_TRANSITIONS: dict[ExperimentStatus, set[ExperimentStatus]] = {
@@ -170,10 +218,16 @@ async def resolve_arm(
         if existing_arm_id:
             arm = next((a for a in arms if a.id == existing_arm_id), arms[0])
         else:
-            arm = pick_arm_deterministic(arms, experiment.id, session_id)
+            if experiment.auto_optimize:
+                arm = await pick_arm_thompson(conn, arms, experiment.id)
+            else:
+                arm = pick_arm_deterministic(arms, experiment.id, session_id)
             await experiments_repo.save_session_assignment(
                 conn, experiment.id, session_id, arm.id
             )
+    elif experiment.auto_optimize:
+        # Thompson Sampling for adaptive routing
+        arm = await pick_arm_thompson(conn, arms, experiment.id)
     elif session_id:
         arm = pick_arm_deterministic(arms, experiment.id, session_id)
     else:
