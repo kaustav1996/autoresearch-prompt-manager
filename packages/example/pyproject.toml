@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "marketing-agent-example"
-version = "0.1.0"
+version = "0.1.1"
 description = "Example marketing content agent demonstrating the full prompt-manager stack"
 requires-python = ">=3.10"
 dependencies = [

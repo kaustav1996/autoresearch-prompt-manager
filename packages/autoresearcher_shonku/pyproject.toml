@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "autoresearcher-shonku"
-version = "0.1.0"
+version = "0.1.1"
 description = "Autonomous prompt optimization agents — autoresearch loop built on shonku"
 readme = "README.md"
 license = "MIT"
