@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "shonku>=0.1.0",
     "autoresearcher-shonku>=0.1.0",
-    "prompt-manager[client,metric]>=0.1.0",
+    "arpm[client,metric]>=0.1.0",
 ]
 
 [project.optional-dependencies]

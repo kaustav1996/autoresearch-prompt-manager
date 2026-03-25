@@ -1,10 +1,32 @@
+<div align="center">
+
+```
+   ___         __        ___                            __
+  / _ | __ __ / /_ ___  / _ \ ___   ___ ___  ___ _ __ / /_
+ / __ |/ // // __// _ \/ , _// -_) (_-</ -_)/ _ `// __/ __/
+/_/ |_|\_,_/ \__/ \___/_/|_| \__/ /___/\__/ \_,_//_/  \__/
+   ___                       __    __  ___
+  / _ \ _______ __ _  ___   / /_  /  |/  /___ _ ___  ___ _ ___ _ ___  ____
+ / ___// __/ _ \  ' \/ _ \ / __/ / /|_/ // _ `// _ \/ _ `// _ `// -_)/ __/
+/_/   /_/  \___/_/_/_/ .__/ \__/ /_/  /_/ \_,_//_//_/\_,_/ \_, / \__//_/
+                     /_/                                   /___/
+```
+
 # autoresearch-prompt-manager
+
+[![CI](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml)
+[![PyPI - shonku](https://img.shields.io/pypi/v/shonku?label=shonku&color=blue)](https://pypi.org/project/shonku/)
+[![PyPI - autoresearcher-shonku](https://img.shields.io/pypi/v/autoresearcher-shonku?label=autoresearcher-shonku&color=green)](https://pypi.org/project/autoresearcher-shonku/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 
 **Autonomous prompt management with versioning, A/B experiments, metrics, and LLM-driven optimization.**
 
-Prompts are code. Version them, experiment with them, measure them, and let an LLM make them better — automatically.
+*Prompts are code. Version them, experiment with them, measure them, and let an LLM make them better — automatically.*
 
-> Inspired by Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) — the same "propose, test, keep or discard" loop, applied to prompts instead of model training.
+</div>
+
+> Inspired by Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) — the same "propose, test, keep or discard" loop, applied to prompts instead of model training. Powered by [agno](https://agno.com) and [AgentOS](https://docs.agno.com/agent-os/introduction).
 
 ## How it works
 

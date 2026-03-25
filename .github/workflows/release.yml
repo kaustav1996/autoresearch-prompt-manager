@@ -59,7 +59,7 @@ jobs:
           packages-dir: packages/shonku/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}
 
-  publish-prompt-manager:
+  publish-arpm:
     needs: test
     runs-on: ubuntu-latest
     environment: pypi
@@ -78,7 +78,7 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
   publish-autoresearcher:
-    needs: publish-shonku
+    needs: [publish-shonku]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -96,7 +96,7 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
   publish-root:
-    needs: [publish-shonku, publish-prompt-manager, publish-autoresearcher]
+    needs: [publish-shonku, publish-arpm, publish-autoresearcher]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -113,7 +113,7 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
   publish-example:
-    needs: [publish-shonku, publish-prompt-manager, publish-autoresearcher]
+    needs: [publish-shonku, publish-arpm, publish-autoresearcher]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
