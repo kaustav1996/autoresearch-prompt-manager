@@ -23,8 +23,15 @@ pip install prompt-manager[all]
 ### Start the API
 
 ```bash
-PM_DATABASE_URL=postgresql://user:pass@localhost:5432/prompts \
-  prompt-manager serve
+# Configure
+export PM_DATABASE_URL=postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager
+export PM_LLM_PROVIDER=groq
+export PM_LLM_MODEL=openai/gpt-oss-120b
+export PM_LLM_API_KEY=your-api-key
+
+# Start
+arpm-api up       # Start PostgreSQL via Docker
+arpm-api start    # Run migrations + start API on :8910
 ```
 
 ### Use the client SDK
@@ -68,18 +75,17 @@ await client.report_metric("welcome-email", str(prompt.version_id), "quality", 8
 - **Sticky sessions** -- same user always sees same variant
 - **Metric collection** -- quality signals per version, batch ingestion
 - **MCP server** -- expose all tools via Model Context Protocol
-- **CLI** -- `prompt-manager serve`, `prompt-manager migrate`, `prompt-manager health`
+- **CLI** -- `arpm-api up`, `arpm-api start`, `arpm-api migrate`, `arpm-api health`
 
 ## Database
 
-Requires PostgreSQL 14+. Migrations run automatically on startup.
+Requires PostgreSQL 14+. Migrations run automatically on `arpm-api start`.
 
 ```bash
-# Docker
-docker compose up -d
+arpm-api up       # Start PostgreSQL via Docker
 
-# Or point to existing Postgres
-PM_DATABASE_URL=postgresql://user:pass@host:5432/dbname prompt-manager migrate
+# Or point to existing Postgres and run migrations only
+PM_DATABASE_URL=postgresql://user:pass@host:5432/dbname arpm-api migrate
 ```
 
 ## Configuration
