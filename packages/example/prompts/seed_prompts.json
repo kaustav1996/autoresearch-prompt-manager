@@ -1,0 +1,30 @@
+[
+    {
+        "slug": "welcome-email",
+        "name": "Welcome Email",
+        "description": "Welcome email for new signups",
+        "content": "Subject: Welcome to {{company_name}}!\n\nHi {{user_name}},\n\nThank you for joining {{company_name}}. We're excited to have you on board.\n\nHere's what you can do next:\n- Explore our features\n- Set up your profile\n- Connect with the community\n\nBest,\nThe {{company_name}} Team",
+        "tags": ["email", "onboarding"]
+    },
+    {
+        "slug": "social-post",
+        "name": "Social Media Post",
+        "description": "Engaging social media post template",
+        "content": "🚀 {{headline}}\n\n{{body}}\n\n{{call_to_action}}\n\n#marketing #{{company_name}}",
+        "tags": ["social", "engagement"]
+    },
+    {
+        "slug": "ad-copy",
+        "name": "Ad Copy",
+        "description": "Short-form ad copy for campaigns",
+        "content": "{{headline}}\n\n{{value_proposition}}\n\n{{call_to_action}}\n\nLearn more at {{url}}",
+        "tags": ["ad", "conversion"]
+    },
+    {
+        "slug": "product-description",
+        "name": "Product Description",
+        "description": "Compelling product description",
+        "content": "Introducing {{product_name}}\n\n{{product_description}}\n\nKey benefits:\n- {{benefit_1}}\n- {{benefit_2}}\n- {{benefit_3}}\n\n{{call_to_action}}",
+        "tags": ["product", "ecommerce"]
+    }
+]

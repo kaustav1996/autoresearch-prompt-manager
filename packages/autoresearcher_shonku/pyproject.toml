@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "autoresearcher-shonku"
+version = "0.1.0"
+description = "Optimization agents built on shonku for autonomous prompt improvement"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "shonku>=0.1.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/autoresearcher_shonku"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

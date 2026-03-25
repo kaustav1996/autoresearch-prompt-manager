@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check packages/*/src
+
+  test-shonku:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install agno pydantic pytest pytest-asyncio
+      - run: pip install -e packages/shonku[dev]
+      - run: python -m pytest packages/shonku/tests -v
+
+  test-prompt-manager:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e packages/prompt_manager[dev,client,metric]
+      - run: python -m pytest packages/prompt_manager/tests -v
+
+  test-autoresearcher:
+    runs-on: ubuntu-latest
+    needs: test-shonku
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install agno pydantic pytest pytest-asyncio
+      - run: pip install -e packages/shonku[dev]
+      - run: pip install -e packages/autoresearcher_shonku[dev]
+      - run: python -m pytest packages/autoresearcher_shonku/tests -v
+
+  test-example:
+    runs-on: ubuntu-latest
+    needs: [test-shonku, test-prompt-manager, test-autoresearcher]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install agno pydantic pydantic-settings pytest pytest-asyncio httpx
+      - run: pip install -e packages/shonku
+      - run: pip install -e packages/prompt_manager[client,metric]
+      - run: pip install -e packages/autoresearcher_shonku
+      - run: pip install -e packages/example[dev]
+      - run: python -m pytest packages/example/tests -v
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [test-prompt-manager, test-autoresearcher]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: prompt_manager
+          POSTGRES_PASSWORD: prompt_manager
+          POSTGRES_DB: prompt_manager
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U prompt_manager"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        volumes:
+          - ${{ github.workspace }}/packages/prompt_manager/migrations:/docker-entrypoint-initdb.d
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install agno pydantic pydantic-settings pytest pytest-asyncio httpx asyncpg fastapi uvicorn
+      - run: pip install -e packages/shonku
+      - run: pip install -e packages/prompt_manager[api,client,metric]
+      - run: pip install -e packages/autoresearcher_shonku
+      - run: |
+          PM_DATABASE_URL=postgresql://prompt_manager:prompt_manager@localhost:5432/prompt_manager \
+            python -m pytest tests/integration/ -v --asyncio-mode=auto

@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Databases
+*.db
+*.sqlite3
+
+# Logs
+*.log
+run.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ruflo / Claude Flow
+.claude-flow/daemon.log
+.claude-flow/daemon.pid
+.claude-flow/daemon-state.json
+.claude-flow/agents.json
+.claude-flow/data/
+.claude-flow/sessions/
+.claude-flow/logs/
+.claude-flow/learning/
+.swarm/
+
+# Agents/Skills (generated)
+.agents/
+.claude/skills/
