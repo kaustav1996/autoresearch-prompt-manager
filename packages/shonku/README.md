@@ -130,3 +130,31 @@ autoresearch-prompt-manager  (prompt CRUD, experiments, metrics)
 ```
 
 Install via the parent package: `pip install autoresearch-prompt-manager[shonku]`
+
+## Contributing
+
+### For humans
+
+1. Fork and clone [autoresearch-prompt-manager](https://github.com/kaustav1996/autoresearch-prompt-manager)
+2. `cd packages/shonku && pip install -e '.[dev]'`
+3. Make changes, run `pytest`, run `ruff check src/`
+4. Submit a PR
+
+### For agents
+
+Build agents with shonku and publish them as PyPI packages:
+
+1. `shonku init my-agent` — scaffold a project
+2. Edit `src/my_agent/agent.py` — add `@tool` methods, set `required_tools`
+3. `pip install -e '.[dev]' && pytest` — verify
+4. Publish to PyPI — anyone can `pip install` and run your agent
+
+Key rules for agent authors:
+- Never hardcode LLM creds — always passed via `LLMConfig` at runtime
+- Never hardcode data access — receive tools from the caller
+- Declare `required_tools` so callers know what to provide
+- Keep agent code agno-free — only `bridge.py` imports agno
+
+## License
+
+MIT

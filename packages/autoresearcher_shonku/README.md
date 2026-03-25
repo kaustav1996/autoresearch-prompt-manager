@@ -96,3 +96,16 @@ autoresearch-prompt-manager  (prompt CRUD, experiments, metrics)
 ```
 
 Install via the parent package: `pip install autoresearch-prompt-manager[autoresearcher]`
+
+## Contributing
+
+1. Fork [autoresearch-prompt-manager](https://github.com/kaustav1996/autoresearch-prompt-manager)
+2. `cd packages/autoresearcher_shonku && pip install -e '.[dev]'`
+3. Make changes, `pytest`, `ruff check src/`
+4. Submit a PR
+
+To add new optimization strategies, create a new agent in `agents/` following the `ShonkuAgent` pattern.
+
+## License
+
+MIT

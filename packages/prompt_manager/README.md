@@ -105,3 +105,15 @@ autoresearch-prompt-manager  (this package -- API, client, metrics)
 ```
 
 LLM-driven optimization is powered by [agno](https://agno.com) and [AgentOS](https://docs.agno.com/agent-os/introduction).
+
+## Contributing
+
+1. Fork [autoresearch-prompt-manager](https://github.com/kaustav1996/autoresearch-prompt-manager)
+2. `cd packages/prompt_manager && pip install -e '.[dev,api,client,metric]'`
+3. Make changes, `pytest`, `ruff check src/`
+4. Integration tests: `PM_DATABASE_URL=... python3 -m pytest tests/integration/`
+5. Submit a PR
+
+## License
+
+MIT
