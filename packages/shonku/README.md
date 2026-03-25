@@ -94,17 +94,39 @@ result = await WeatherAgent().run(
 )
 ```
 
+## Configuration
+
+LLM credentials are passed at runtime via `LLMConfig`, never stored in the agent:
+
+```python
+from shonku import LLMConfig
+
+llm_config = LLMConfig(
+    provider="groq",              # or: anthropic, openai, gemini, openrouter
+    model="openai/gpt-oss-120b",  # model ID for the provider
+    api_key="your-api-key",       # API key
+)
+```
+
+When used with autoresearch-prompt-manager, these map to environment variables:
+
+| Env var | LLMConfig field | Example |
+|---------|----------------|---------|
+| `PM_LLM_PROVIDER` | `provider` | `groq` |
+| `PM_LLM_MODEL` | `model` | `openai/gpt-oss-120b` |
+| `PM_LLM_API_KEY` | `api_key` | `gsk_...` |
+
 ## Supported LLM providers
 
 All providers supported by [agno](https://docs.agno.com) work out of the box:
 
-| Provider | Config |
-|----------|--------|
-| Anthropic (Claude) | `provider="anthropic"` |
-| OpenAI | `provider="openai"` |
-| Groq | `provider="groq"` |
-| Google Gemini | `provider="gemini"` |
-| OpenRouter | `provider="openrouter"` |
+| Provider | `provider=` | Example model |
+|----------|-------------|---------------|
+| Anthropic (Claude) | `anthropic` | `claude-sonnet-4-20250514` |
+| OpenAI | `openai` | `gpt-4o` |
+| Groq | `groq` | `openai/gpt-oss-120b` |
+| Google Gemini | `gemini` | `gemini-2.0-flash` |
+| OpenRouter | `openrouter` | `meta-llama/llama-3.1-70b` |
 
 ## Built on agno
 

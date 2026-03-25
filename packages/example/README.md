@@ -221,12 +221,17 @@ pytest
 
 ## Configuration
 
+```bash
+export PM_DATABASE_URL=postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager
+export PM_LLM_PROVIDER=groq              # or: anthropic, openai, gemini, openrouter
+export PM_LLM_MODEL=openai/gpt-oss-120b  # or: claude-sonnet-4-20250514, gpt-4o, etc.
+export PM_LLM_API_KEY=your-api-key       # required for optimization + content generation
+```
+
 | Env Var | Default | Description |
 |---------|---------|-------------|
-| `PM_DATABASE_URL` | `postgresql://localhost:5432/prompt_manager` | PostgreSQL connection string |
-| `PM_PORT` | `8910` | API server port |
-| `PM_LLM_PROVIDER` | `anthropic` | LLM provider for optimisation |
-| `PM_LLM_MODEL` | `claude-sonnet-4-20250514` | Model ID |
-| `PM_LLM_API_KEY` | -- | API key for the LLM provider |
-
-The demo script hardcodes Groq + gpt-oss-120b. To use a different provider, edit the `LLMConfig` in `demo_full_loop.py`.
+| `PM_DATABASE_URL` | `postgresql://localhost:5432/prompt_manager` | PostgreSQL connection |
+| `PM_API_URL` | `http://localhost:8910` | Prompt Manager API URL |
+| `PM_LLM_PROVIDER` | `groq` | LLM provider |
+| `PM_LLM_MODEL` | `openai/gpt-oss-120b` | Model ID |
+| `PM_LLM_API_KEY` / `GROQ_API_KEY` | -- | API key (required) |

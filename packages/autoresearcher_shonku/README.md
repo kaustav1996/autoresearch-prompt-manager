@@ -69,6 +69,18 @@ The `AutoResearcherAgent` includes a built-in `check_safety_rails` tool that val
 
 ## Configuration
 
+### LLM settings
+
+The autoresearcher receives LLM config at runtime. When used with autoresearch-prompt-manager, set:
+
+```bash
+export PM_LLM_PROVIDER=groq              # or: anthropic, openai, gemini, openrouter
+export PM_LLM_MODEL=openai/gpt-oss-120b  # model ID
+export PM_LLM_API_KEY=your-api-key       # provider API key
+```
+
+### Optimization settings
+
 ```python
 from autoresearcher_shonku import AutoResearcherConfig
 
