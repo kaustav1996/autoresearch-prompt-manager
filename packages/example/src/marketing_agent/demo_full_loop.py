@@ -25,6 +25,8 @@ from __future__ import annotations
 import asyncio
 import json
 
+import os
+
 import httpx
 
 from marketing_agent.agent import MarketingContentAgent
@@ -33,8 +35,12 @@ from prompt_manager.client import PromptManagerClient
 from shonku import LLMConfig
 from shonku.types import ToolSpec
 
-GROQ_KEY = "GROQ_API_KEY_REDACTED"
-API_URL = "http://localhost:8910"
+GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
+API_URL = os.environ.get("PM_API_URL", "http://localhost:8910")
+DB_URL = os.environ.get(
+    "PM_DATABASE_URL",
+    "postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager",
+)
 
 
 async def setup_prompt_and_versions(api: httpx.AsyncClient) -> dict:
@@ -365,6 +371,11 @@ async def main():
     print("  Model: Groq gpt-oss-120b")
     print("=" * 60)
 
+    if not GROQ_KEY:
+        print("\nError: GROQ_API_KEY environment variable is required.")
+        print("  export GROQ_API_KEY=gsk_...")
+        return
+
     api = httpx.AsyncClient(base_url=API_URL, timeout=60)
     client = PromptManagerClient(base_url=API_URL)
     llm_config = LLMConfig(
@@ -375,9 +386,7 @@ async def main():
 
     # Clean slate
     import asyncpg
-    conn = await asyncpg.connect(
-        "postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager"
-    )
+    conn = await asyncpg.connect(DB_URL)
     for t in [
         "metric_events", "session_assignments", "experiment_arms",
         "experiments", "optimization_runs", "prompt_versions", "prompts",
