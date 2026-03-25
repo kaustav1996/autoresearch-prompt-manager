@@ -5,25 +5,87 @@ build-backend = "hatchling.build"
 [project]
 name = "autoresearch-prompt-manager"
 version = "0.1.0"
-description = "Autonomous prompt management with A/B testing, metrics, and LLM-driven optimization"
+description = "Autonomous prompt management with versioning, A/B experiments, metrics, and LLM-driven optimization"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
-dependencies = []
+authors = [
+    { name = "Kaustav", email = "kaustavsmailbox21@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["prompt", "llm", "a/b-testing", "optimization", "agents"]
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+]
 
 [project.optional-dependencies]
-api = ["prompt-manager[api]"]
-client = ["prompt-manager[client]"]
-metric = ["prompt-manager[metric]"]
-all = [
-    "prompt-manager[all]",
-    "shonku",
-    "autoresearcher-shonku",
+# Core extras — install what you need
+api = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "asyncpg>=0.29",
+    "httpx>=0.27",
 ]
+client = [
+    "httpx>=0.27",
+]
+metric = [
+    "httpx>=0.27",
+]
+mcp = [
+    "mcp>=1.0",
+    "asyncpg>=0.29",
+]
+
+# Agent framework — for building and publishing agents
+shonku = [
+    "shonku>=0.1.0",
+]
+
+# Autonomous optimization — the autoresearch loop
+autoresearcher = [
+    "autoresearcher-shonku>=0.1.0",
+]
+
+# Everything
+all = [
+    "autoresearch-prompt-manager[api,client,metric,mcp,shonku,autoresearcher]",
+]
+
+# Development
 dev = [
-    "prompt-manager[dev]",
-    "shonku[dev]",
-    "autoresearcher-shonku[dev]",
+    "autoresearch-prompt-manager[all]",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-httpx>=0.30",
     "ruff>=0.4",
     "mypy>=1.10",
+]
+
+[project.scripts]
+prompt-manager = "prompt_manager.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/kaustav1996/autoresearch-prompt-manager"
+Documentation = "https://github.com/kaustav1996/autoresearch-prompt-manager#readme"
+Repository = "https://github.com/kaustav1996/autoresearch-prompt-manager"
+Issues = "https://github.com/kaustav1996/autoresearch-prompt-manager/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "packages/prompt_manager/src/prompt_manager",
 ]
 
 [tool.ruff]
