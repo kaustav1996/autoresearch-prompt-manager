@@ -1,4 +1,4 @@
-# shonku
+# Shonku
 
 ## What it is
 

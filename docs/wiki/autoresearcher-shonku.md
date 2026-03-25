@@ -1,4 +1,4 @@
-# autoresearcher-shonku
+# Autoresearcher Shonku
 
 ## The autoresearch pattern
 

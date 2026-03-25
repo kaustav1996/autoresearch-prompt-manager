@@ -2,7 +2,7 @@
 
 <img src="docs/banner.png" alt="autoresearch-prompt-manager" width="100%">
 
-# autoresearch-prompt-manager
+# Autoresearch Prompt Manager
 
 [![CI](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/ci.yml)
 [![Release](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/release.yml/badge.svg)](https://github.com/kaustav1996/autoresearch-prompt-manager/actions/workflows/release.yml)

@@ -1,4 +1,4 @@
-# autoresearcher-shonku
+# Autoresearcher Shonku
 
 Autonomous prompt optimization agents built on [shonku](https://github.com/kaustav1996/autoresearch-prompt-manager/tree/main/packages/shonku).
 

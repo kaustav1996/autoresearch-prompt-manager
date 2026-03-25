@@ -1,4 +1,4 @@
-# prompt-manager
+# Prompt Manager
 
 Versioned prompt CRUD, A/B experiments, metric collection, and LLM-driven optimization API.
 

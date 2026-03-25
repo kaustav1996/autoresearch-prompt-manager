@@ -1,4 +1,4 @@
-# shonku
+# Shonku
 
 Build, publish, and run AI agents as PyPI packages.
 

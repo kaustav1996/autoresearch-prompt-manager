@@ -1,4 +1,4 @@
-# autoresearch-prompt-manager
+# Autoresearch Prompt Manager
 
 ## The problem it solves
 
