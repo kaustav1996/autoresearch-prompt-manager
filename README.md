@@ -124,8 +124,33 @@ await client.report_metric("welcome-email", str(prompt.version_id), "quality", 8
 - Weighted traffic splitting across prompt versions
 - MurmurHash3 deterministic routing (same user = same variant)
 - Sticky sessions persisted to PostgreSQL
-- **Thompson Sampling** — adaptive routing when `auto_optimize=true`
+- **Thompson Sampling** for adaptive routing (see below)
 - Monotonic rollout (5% users are a strict subset of 20% users)
+
+</details>
+
+<details>
+<summary><b>Why Thompson Sampling</b></summary>
+
+When `auto_optimize=true` on an experiment, the system uses [Thompson Sampling](https://en.wikipedia.org/wiki/Thompson_sampling) instead of fixed traffic weights. Each arm is modeled as a Beta distribution: `Beta(1 + successes, 1 + failures)`. On every request, we sample from each arm's posterior and route to the arm with the highest sample.
+
+We chose Thompson Sampling over the alternatives for specific reasons:
+
+| Algorithm | Why we didn't pick it |
+|---|---|
+| **Epsilon-Greedy** | Explores randomly. Wastes traffic on arms that are clearly worse. No sense of uncertainty. |
+| **UCB (Upper Confidence Bound)** | Assumes stationary rewards. LLM output quality shifts over time as prompts change. UCB adapts poorly to that. |
+| **Fixed A/B split** | Requires manual intervention to stop the experiment. No automatic convergence. |
+
+Thompson Sampling gives us three things that matter for prompt experiments:
+
+1. **Natural exploration decay.** Early on, when we have few data points, the Beta distributions are wide, so routing is close to random. As data accumulates, the distributions narrow, and traffic shifts toward the winner. No epsilon to tune.
+
+2. **Handles noisy metrics.** LLM quality scores are inherently noisy. The same prompt can score 6 one time and 8 the next. Thompson Sampling's Bayesian foundation treats this uncertainty as a first-class concept rather than averaging it away.
+
+3. **Near-optimal regret bounds.** It is provably close to the best you can do without knowing the answer in advance. The math is clean: [Agrawal & Goyal 2012](https://proceedings.mlr.press/v23/agrawal12/agrawal12.pdf).
+
+If your use case needs a different algorithm (contextual bandits, UCB variants, epsilon-greedy for simplicity), we welcome PRs. The routing logic lives in `experiment_service.py:pick_arm_thompson()` and is designed to be swappable.
 
 </details>
 
