@@ -1,0 +1,3 @@
+[submodule "wiki"]
+	path = wiki
+	url = git@github.com:kaustav1996/autoresearch-prompt-manager.wiki.git
