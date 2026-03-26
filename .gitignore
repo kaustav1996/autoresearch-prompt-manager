@@ -40,17 +40,17 @@ run.log
 .DS_Store
 Thumbs.db
 
-# Ruflo / Claude Flow
-.claude-flow/daemon.log
-.claude-flow/daemon.pid
-.claude-flow/daemon-state.json
-.claude-flow/agents.json
-.claude-flow/data/
-.claude-flow/sessions/
-.claude-flow/logs/
-.claude-flow/learning/
+# Ruflo / Claude Flow (generated runtime state)
+.claude-flow/
 .swarm/
 
-# Agents/Skills (generated)
+# Claude Code (generated config/agents/skills)
+.claude/
+.codex/
+
+# Generated agents/skills
+agents/
 .agents/
-.claude/skills/
+skills/
+skills-lock.json
+AGENTS.md
