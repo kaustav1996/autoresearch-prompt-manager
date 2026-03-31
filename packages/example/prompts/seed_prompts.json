@@ -1,30 +1,30 @@
 [
     {
-        "slug": "welcome-email",
-        "name": "Welcome Email",
-        "description": "Welcome email for new signups",
-        "content": "Subject: Welcome to {{company_name}}!\n\nHi {{user_name}},\n\nThank you for joining {{company_name}}. We're excited to have you on board.\n\nHere's what you can do next:\n- Explore our features\n- Set up your profile\n- Connect with the community\n\nBest,\nThe {{company_name}} Team",
-        "tags": ["email", "onboarding"]
+        "slug": "ig-post-caption",
+        "name": "Instagram Post Caption",
+        "description": "Engaging Instagram caption with hook, body, CTA, and hashtags",
+        "content": "{{hook}}\n\n{{body}}\n\n{{call_to_action}}\n\n.\n.\n.\n#{{niche}} #{{brand}} {{hashtags}}",
+        "tags": ["instagram", "caption", "engagement"]
     },
     {
-        "slug": "social-post",
-        "name": "Social Media Post",
-        "description": "Engaging social media post template",
-        "content": "🚀 {{headline}}\n\n{{body}}\n\n{{call_to_action}}\n\n#marketing #{{company_name}}",
-        "tags": ["social", "engagement"]
+        "slug": "ig-reel-script",
+        "name": "Instagram Reel Script",
+        "description": "Short-form vertical video script with hook, scenes, and CTA",
+        "content": "[HOOK - 0:00-0:03]\n{{hook_line}}\n\n[SCENE 1 - 0:03-0:10]\nVO: {{scene_1_voiceover}}\n\n[SCENE 2 - 0:10-0:20]\nVO: {{scene_2_voiceover}}\n\n[CTA - 0:20-0:30]\n{{call_to_action}}\n\nCaption: {{caption}}",
+        "tags": ["instagram", "reel", "video", "script"]
     },
     {
-        "slug": "ad-copy",
-        "name": "Ad Copy",
-        "description": "Short-form ad copy for campaigns",
-        "content": "{{headline}}\n\n{{value_proposition}}\n\n{{call_to_action}}\n\nLearn more at {{url}}",
-        "tags": ["ad", "conversion"]
+        "slug": "ig-design-brief",
+        "name": "Instagram Design Brief",
+        "description": "Visual design brief for Instagram post or story assets",
+        "content": "DESIGN BRIEF: {{post_title}}\n\nVisual Direction:\n- Theme: {{visual_theme}}\n- Color palette: {{colors}}\n- Typography: {{font_style}}\n\nMain asset: {{main_image_description}}\n\nText overlay: {{text_overlay}}\n\nFormat: {{format}} (Feed / Reel Cover / Story)",
+        "tags": ["instagram", "design", "visual", "brief"]
     },
     {
-        "slug": "product-description",
-        "name": "Product Description",
-        "description": "Compelling product description",
-        "content": "Introducing {{product_name}}\n\n{{product_description}}\n\nKey benefits:\n- {{benefit_1}}\n- {{benefit_2}}\n- {{benefit_3}}\n\n{{call_to_action}}",
-        "tags": ["product", "ecommerce"]
+        "slug": "ig-hashtag-strategy",
+        "name": "Instagram Hashtag Strategy",
+        "description": "Tiered hashtag strategy mixing niche, mid-tier, and broad reach tags",
+        "content": "HASHTAG STRATEGY: {{campaign_name}}\n\nNiche hashtags (high-intent, <100k):\n{{niche_hashtags}}\n\nMid-tier (100k-1M):\n{{mid_hashtags}}\n\nBroad reach (1M+):\n{{broad_hashtags}}\n\nBranded:\n#{{brand_hashtag}}\n\nRecommended mix: {{recommended_count}} total",
+        "tags": ["instagram", "hashtags", "reach", "strategy"]
     }
 ]

@@ -26,7 +26,7 @@ class TestMarketingContentAgent:
         agent = MarketingContentAgent()
         assert agent.name == "marketing-content-agent"
         assert agent.version == "0.1.0"
-        assert "marketing content" in agent.description.lower()
+        assert "instagram" in agent.description.lower() or "content" in agent.description.lower()
 
     def test_required_tools_declared(self):
         agent = MarketingContentAgent()
@@ -39,26 +39,34 @@ class TestMarketingContentAgent:
 
     def test_rate_content_basic_scoring(self):
         agent = MarketingContentAgent()
-        # Short content gets base score
-        result = json.loads(agent.rate_content("Hi", "social"))
+        # Short content with no signals gets base score
+        result = json.loads(agent.rate_content("Hi", "caption"))
         assert result["quality_score"] == 5.0
 
-        # Longer content with engagement signals scores higher
-        long_content = "Check out this exclusive limited-time offer! " * 10
-        result = json.loads(agent.rate_content(long_content, "email"))
+        # Caption with Instagram engagement signals scores higher
+        good_caption = "✨ Double tap if you agree! " + "x" * 100 + " #inspiration save this"
+        result = json.loads(agent.rate_content(good_caption, "caption"))
         assert result["quality_score"] > 5.0
 
-    def test_rate_content_email_bonus(self):
+    def test_rate_content_instagram_engagement_bonus(self):
         agent = MarketingContentAgent()
-        email = "Subject: Welcome!\n\n" + "x" * 201
-        result = json.loads(agent.rate_content(email, "email"))
-        # Should get: base(5) + len>50(1) + len>200(1) + !(0.5) + subject(1) = 8.5
+        # Caption with all signals: len>50, len>200, emoji, hashtag, CTA
+        caption = "✨ Transform your mornings! " + "x" * 180 + " #wellness #morning link in bio"
+        result = json.loads(agent.rate_content(caption, "caption"))
+        # base(5) + len>50(1) + len>200(0.5) + emoji(0.5) + hashtag(0.5) + CTA(1.0) = 8.5
+        assert result["quality_score"] == 8.5
+
+    def test_rate_content_reel_script_bonus(self):
+        agent = MarketingContentAgent()
+        script = "✨ Hook! " + "x" * 60 + " #reel\nVO: This is scene 1 save this"
+        result = json.loads(agent.rate_content(script, "reel_script"))
+        # base(5) + len>50(1) + emoji(0.5) + hashtag(0.5) + CTA(1.0) + reel(0.5) = 8.5
         assert result["quality_score"] == 8.5
 
     def test_rate_content_capped_at_ten(self):
         agent = MarketingContentAgent()
-        content = "Subject: Free exclusive limited offer! " * 20
-        result = json.loads(agent.rate_content(content, "email"))
+        content = "✨ Save this! link in bio #wellness #fitness " * 10
+        result = json.loads(agent.rate_content(content, "caption"))
         assert result["quality_score"] <= 10.0
 
 
