@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from prompt_manager.core.enums import ExperimentStatus, VersionSource
+from prompt_manager.core.enums import VersionSource
 from prompt_manager.core.schemas import (
     ArmCreate,
     ExperimentCreate,

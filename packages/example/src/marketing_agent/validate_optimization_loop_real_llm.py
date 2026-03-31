@@ -27,7 +27,7 @@ import re
 import statistics
 import sys
 import textwrap
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
@@ -53,14 +53,14 @@ for _candidate in [
 # ---------------------------------------------------------------------------
 # Real tool imports (installed packages — no DB/LLM in these modules)
 # ---------------------------------------------------------------------------
+from autoresearcher_shonku.scoring import (  # noqa: E402
+    compute_composite_score,
+    is_improvement,
+)
 from autoresearcher_shonku.tools.analysis import analyze_metric_trends  # noqa: E402
 from autoresearcher_shonku.tools.validation import (  # noqa: E402
     compute_similarity,
     validate_template_vars,
-)
-from autoresearcher_shonku.scoring import (  # noqa: E402
-    compute_composite_score,
-    is_improvement,
 )
 
 # ---------------------------------------------------------------------------
@@ -217,7 +217,8 @@ CURRENT PROMPT (v{current_version}):
 ---
 
 PERFORMANCE METRICS (last {SESSIONS_PER_ITER} simulated sessions):
-  engagement_rate : {metric_means['engagement_rate']:.4f}  (trend: {trends.get('engagement_rate', '?')})
+  engagement_rate : {metric_means['engagement_rate']:.4f}  \
+(trend: {trends.get('engagement_rate', '?')})
   likes_rate      : {metric_means['likes_rate']:.4f}  (trend: {trends.get('likes_rate', '?')})
   comments_rate   : {metric_means['comments_rate']:.4f}  (trend: {trends.get('comments_rate', '?')})
   shares_rate     : {metric_means['shares_rate']:.4f}  (trend: {trends.get('shares_rate', '?')})
@@ -230,7 +231,8 @@ TASK:
 Propose ONE focused improvement to this Instagram marketing post template.
 
 HARD CONSTRAINTS (violation = proposal rejected):
-  1. Keep ALL four template variables exactly as-is: {{name}}, {{product}}, {{promo_code}}, {{brand}}
+  1. Keep ALL four template variables exactly as-is: \
+{{name}}, {{product}}, {{promo_code}}, {{brand}}
   2. The improved prompt must be 30–300% the length of the current prompt
   3. Must remain clearly similar to current (similarity ≥ 0.30) — no complete rewrites
 
@@ -242,7 +244,10 @@ IMPROVEMENT GOALS (pick 1–2 to address):
   - Add or improve emoji usage for visual appeal
 
 Respond with ONLY valid JSON, no markdown, no preamble:
-{{"improved_prompt": "<full prompt text with template vars>", "reasoning": "<1-2 sentences>", "expected_improvement": "<what metric you expect to improve and why>", "risk": "low"}}"""
+{{"improved_prompt": "<full prompt text with template vars>", \
+"reasoning": "<1-2 sentences>", \
+"expected_improvement": "<what metric you expect to improve and why>", \
+"risk": "low"}}"""
 
 
 def propose_improvement_via_llm(
@@ -267,7 +272,8 @@ def propose_improvement_via_llm(
                     "role": "system",
                     "content": (
                         "You are a prompt optimization expert. "
-                        "Always respond with valid JSON only — no markdown, no explanation outside the JSON."
+                        "Always respond with valid JSON only — "
+                        "no markdown, no explanation outside the JSON."
                     ),
                 },
                 {"role": "user", "content": user_msg},
@@ -556,12 +562,16 @@ def print_summary(results: list[IterationResult]) -> None:
             "↑ improving" if score_delta > 0.001
             else ("↓ declining" if score_delta < -0.001 else "→ stable")
         )
-        print(f"  First → last     : {scores[0]:.4f} → {scores[-1]:.4f}  ({score_delta:+.4f})  {trend}")
+        print(
+            f"  First → last     : {scores[0]:.4f} → {scores[-1]:.4f}"
+            f"  ({score_delta:+.4f})  {trend}"
+        )
 
     if len(scores) >= 4:
         last_3 = scores[-3:]
         spread = max(last_3) - min(last_3)
-        print(f"  Last-3 spread    : {spread:.4f}  → {'CONVERGED' if spread < 0.005 else 'still evolving'}")
+        converging = "CONVERGED" if spread < 0.005 else "still evolving"
+        print(f"  Last-3 spread    : {spread:.4f}  → {converging}")
 
     print("\n  Per-iteration table:")
     print(f"  {'Iter':>4}  {'v':>3}  {'Score':>7}  {'Delta':>7}  {'Accept':>6}  Reason")
@@ -575,9 +585,10 @@ def print_summary(results: list[IterationResult]) -> None:
 
     # Show final accepted prompts
     if accepted:
-        print(f"\n  LLM PROPOSALS (accepted):")
+        print("\n  LLM PROPOSALS (accepted):")
         for r in accepted:
-            print(f"    Iter {r.iteration}: {r.llm_reasoning or '(no reasoning)'}  [{r.similarity:.2f} sim]")
+            reasoning = r.llm_reasoning or "(no reasoning)"
+            print(f"    Iter {r.iteration}: {reasoning}  [{r.similarity:.2f} sim]")
 
     print("\n" + "=" * 70)
     if len(accepted) > 0:

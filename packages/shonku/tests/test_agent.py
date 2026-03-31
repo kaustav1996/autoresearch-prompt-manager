@@ -5,7 +5,6 @@ from __future__ import annotations
 from shonku.agent import ShonkuAgent
 from shonku.decorators import tool
 
-
 # -- fixtures ------------------------------------------------------------
 
 

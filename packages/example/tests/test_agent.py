@@ -4,15 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
-
-import pytest
+from unittest.mock import MagicMock
 
 from marketing_agent.agent import MarketingContentAgent
 from marketing_agent.config import MarketingAgentConfig
 from marketing_agent.tools import create_prompt_manager_tools
-
 
 # ---------------------------------------------------------------------------
 # Agent tests

@@ -9,7 +9,7 @@ from uuid import uuid4
 
 import pytest
 
-from prompt_manager.core.enums import ExperimentStatus, VersionSource
+from prompt_manager.core.enums import ExperimentStatus
 from prompt_manager.core.exceptions import (
     DuplicateContentError,
     DuplicateSlugError,
@@ -18,7 +18,7 @@ from prompt_manager.core.exceptions import (
     PromptNotFoundError,
 )
 from prompt_manager.core.models import Experiment, Prompt, PromptVersion
-from prompt_manager.core.schemas import ArmCreate, PromptCreate, PromptUpdate
+from prompt_manager.core.schemas import ArmCreate, PromptCreate
 
 
 def _now() -> datetime:

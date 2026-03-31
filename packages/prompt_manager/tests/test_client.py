@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from uuid import uuid4
 
 import httpx
@@ -11,7 +10,6 @@ import pytest
 from prompt_manager.client.cache import TTLCache
 from prompt_manager.client.client import PromptManagerClient
 from prompt_manager.client.models import ResolvedPrompt
-
 
 # ── TTLCache tests ────────────────────────────────────────────────────────
 
@@ -145,7 +143,9 @@ async def test_resolve(client: PromptManagerClient, mock_transport: MockTranspor
 
 
 @pytest.mark.asyncio
-async def test_resolve_with_cache(client: PromptManagerClient, mock_transport: MockTransport) -> None:
+async def test_resolve_with_cache(
+    client: PromptManagerClient, mock_transport: MockTransport,
+) -> None:
     await client.resolve("my-prompt")
     await client.resolve("my-prompt")
     # Second call should hit cache

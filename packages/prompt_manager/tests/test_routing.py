@@ -5,8 +5,6 @@ from __future__ import annotations
 from collections import Counter
 from uuid import UUID, uuid4
 
-import pytest
-
 from prompt_manager.api.services.experiment_service import (
     _murmur3_32,
     pick_arm_deterministic,

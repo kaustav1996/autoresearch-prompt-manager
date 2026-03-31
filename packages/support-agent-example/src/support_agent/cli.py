@@ -109,10 +109,10 @@ async def _seed() -> None:
 
 
 async def _run(task: str) -> None:
-    from support_agent.agent import CustomerSupportAgent
-    from support_agent.tools import create_prompt_manager_tools
     from prompt_manager.client import PromptManagerClient
     from shonku import LLMConfig
+    from support_agent.agent import CustomerSupportAgent
+    from support_agent.tools import create_prompt_manager_tools
 
     cfg = _get_config()
     if not cfg["llm_api_key"]:

@@ -6,12 +6,9 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import pytest
-
 from support_agent.agent import CustomerSupportAgent
 from support_agent.config import SupportAgentConfig
 from support_agent.tools import create_prompt_manager_tools
-
 
 # ---------------------------------------------------------------------------
 # Agent tests
