@@ -83,7 +83,8 @@ class CustomerSupportAgent(ShonkuAgent):
             first_contact += 1.0
 
         # CTA / next step signals raise first-contact resolution likelihood
-        if any(p in response_lower for p in ["let me know", "reach out", "feel free", "contact us"]):
+        cta_phrases = ["let me know", "reach out", "feel free", "contact us"]
+        if any(p in response_lower for p in cta_phrases):
             first_contact += 1.0
 
         # Scenario-specific bonuses

@@ -29,11 +29,11 @@ import os
 
 import httpx
 
-from support_agent.agent import CustomerSupportAgent
-from support_agent.tools import create_prompt_manager_tools
 from prompt_manager.client import PromptManagerClient
 from shonku import LLMConfig
 from shonku.types import ToolSpec
+from support_agent.agent import CustomerSupportAgent
+from support_agent.tools import create_prompt_manager_tools
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
 API_URL = os.environ.get("PM_API_URL", "http://localhost:8910")
@@ -144,7 +144,8 @@ async def run_agent_sessions(
         result = await agent.run(
             input=(
                 f"Customer {session_id} has an issue: {issue}. "
-                f"Use resolve_prompt with slug='ticket-response-demo' and session_id='{session_id}'. "
+                f"Use resolve_prompt with slug='ticket-response-demo' "
+                f"and session_id='{session_id}'. "
                 "Generate a support response from the template. "
                 "Rate it with rate_response (scenario_type='ticket'). "
                 "Report csat_score, tone_score, and resolution_score with report_metric."

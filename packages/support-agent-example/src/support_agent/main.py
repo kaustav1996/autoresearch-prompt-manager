@@ -30,11 +30,11 @@ import asyncio
 import json
 from pathlib import Path
 
+from prompt_manager.client import PromptManagerClient
+from shonku import LLMConfig
 from support_agent.agent import CustomerSupportAgent
 from support_agent.config import SupportAgentConfig
 from support_agent.tools import create_prompt_manager_tools
-from prompt_manager.client import PromptManagerClient
-from shonku import LLMConfig
 
 
 async def seed_prompts(client: PromptManagerClient) -> None:
@@ -76,8 +76,10 @@ async def handle_support_requests(
     tasks = [
         "A customer reports they cannot log into their account after resetting their password",
         "A customer is asking how to export their data from the platform",
-        "A customer is very frustrated — their order has been delayed 3 times and they want a refund",
-        "Decide whether to escalate: customer claims a bug caused data loss affecting their business",
+        "A customer is very frustrated — their order has been delayed 3 times"
+        " and they want a refund",
+        "Decide whether to escalate: customer claims a bug caused"
+        " data loss affecting their business",
     ]
 
     for task in tasks:

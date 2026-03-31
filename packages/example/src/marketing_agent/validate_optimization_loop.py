@@ -21,7 +21,7 @@ import random
 import statistics
 import sys
 import textwrap
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
@@ -36,14 +36,14 @@ for _pkg in ["autoresearcher_shonku", "prompt_manager", "shonku"]:
         sys.path.insert(0, str(_src))
 
 # Real tool imports (pure-Python, no DB/LLM needed)
+from autoresearcher_shonku.scoring import (  # noqa: E402
+    compute_composite_score,
+    is_improvement,
+)
 from autoresearcher_shonku.tools.analysis import analyze_metric_trends  # noqa: E402
 from autoresearcher_shonku.tools.validation import (  # noqa: E402
     compute_similarity,
     validate_template_vars,
-)
-from autoresearcher_shonku.scoring import (  # noqa: E402
-    compute_composite_score,
-    is_improvement,
 )
 
 # ---------------------------------------------------------------------------
@@ -454,15 +454,22 @@ def print_summary(results: list[IterationResult]) -> None:
 
     if len(scores) >= 2:
         score_delta = scores[-1] - scores[0]
-        trend = "↑ improving" if score_delta > 0.001 else ("↓ declining" if score_delta < -0.001 else "→ stable")
-        print(f"  First → last     : {scores[0]:.4f} → {scores[-1]:.4f}  ({score_delta:+.4f})  {trend}")
+        trend = (
+            "↑ improving" if score_delta > 0.001
+            else ("↓ declining" if score_delta < -0.001 else "→ stable")
+        )
+        print(
+            f"  First → last     : {scores[0]:.4f} → {scores[-1]:.4f}"
+            f"  ({score_delta:+.4f})  {trend}"
+        )
 
     # Convergence check
     if len(scores) >= 4:
         last_3 = scores[-3:]
         spread = max(last_3) - min(last_3)
         converged = spread < 0.005
-        print(f"  Last-3 spread    : {spread:.4f}  → {'CONVERGED' if converged else 'still evolving'}")
+        converging = "CONVERGED" if converged else "still evolving"
+        print(f"  Last-3 spread    : {spread:.4f}  → {converging}")
 
     print("\n  Per-iteration table:")
     print(f"  {'Iter':>4}  {'v':>3}  {'Score':>7}  {'Delta':>7}  {'Accept':>6}  Reason")
