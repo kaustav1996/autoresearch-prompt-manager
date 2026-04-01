@@ -2,20 +2,15 @@
 Full Loop Demo: Multi-version prompts, experiment routing, autoresearcher optimization
 
 This script demonstrates the complete autoresearch-prompt-manager stack for
-Instagram content creation:
+customer support:
 
-1. Create an Instagram caption prompt with 2 versions (minimal vs emoji-rich)
+1. Create a ticket-response prompt with 2 versions (scripted vs empathetic)
 2. Set up an A/B experiment with 50/50 routing
-3. Run the Instagram content agent multiple times — routed to different versions
-4. Agent rates each version and reports engagement_rate metrics
+3. Run the support agent multiple times — it gets routed to different versions
+4. Agent rates each version and reports CSAT, tone, and resolution metrics
 5. Autoresearcher analyzes metrics, proposes a NEW improved version, deploys it
 
-Stack: marketing-agent → prompt-manager → autoresearcher-shonku → shonku → agno → Groq
-
-Metrics tracked per version:
-  - engagement_rate  (composite: likes + comments + shares + saves / views)
-  - views            (simulated impressions)
-  - likes, comments, shares, saves (simulated interaction counts)
+Stack: support-agent → prompt-manager → autoresearcher-shonku → shonku → agno → Groq
 
 Usage:
     # Start API first:
@@ -23,7 +18,7 @@ Usage:
         python3 -m prompt_manager.api.main
 
     # Then run:
-    python3 -m marketing_agent.demo_full_loop
+    python3 -m support_agent.demo_full_loop
 """
 
 from __future__ import annotations
@@ -34,11 +29,11 @@ import os
 
 import httpx
 
-from marketing_agent.agent import MarketingContentAgent
-from marketing_agent.tools import create_prompt_manager_tools
 from prompt_manager.client import PromptManagerClient
 from shonku import LLMConfig
 from shonku.types import ToolSpec
+from support_agent.agent import CustomerSupportAgent
+from support_agent.tools import create_prompt_manager_tools
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
 API_URL = os.environ.get("PM_API_URL", "http://localhost:8910")
@@ -47,48 +42,50 @@ DB_URL = os.environ.get(
     "postgresql://prompt_manager:prompt_manager@localhost:15432/prompt_manager",
 )
 
-PROMPT_SLUG = "ig-post-caption"
-
 
 async def setup_prompt_and_versions(api: httpx.AsyncClient) -> dict:
-    """Create an Instagram caption prompt with 2 versions and return IDs."""
+    """Create a ticket-response prompt with 2 versions and return IDs."""
     print("=" * 60)
-    print("STEP 1: Create Instagram caption prompt with 2 versions")
+    print("STEP 1: Create prompt with 2 versions")
     print("=" * 60)
 
-    # v1 — minimal, clean style
+    # Create prompt (v1 - scripted/formal)
     resp = await api.post("/prompts", json={
-        "slug": PROMPT_SLUG,
-        "name": "Instagram Post Caption",
+        "slug": "ticket-response-demo",
+        "name": "Ticket Response Demo",
         "body": (
-            "{hook}\n\n"
-            "{body}\n\n"
-            "👇 {call_to_action}\n\n"
-            "#{niche} #{brand}"
+            "Dear {customer_name},\n\n"
+            "Thank you for contacting {company} support.\n\n"
+            "We have received your request regarding: {issue_summary}\n\n"
+            "Our team will investigate and respond within 24-48 business hours.\n\n"
+            "Reference: {ticket_id}\n\n"
+            "Regards,\n{company} Support Team"
         ),
-        "tags": ["instagram", "caption"],
+        "tags": ["support", "ticket"],
     })
     data = resp.json()
     prompt_id = data["id"]
-    print(f"  v1 (minimal): {prompt_id}")
+    print(f"  v1 (scripted): {prompt_id}")
 
     # Get v1 ID
-    resp = await api.get(f"/prompts/{PROMPT_SLUG}/versions")
+    resp = await api.get("/prompts/ticket-response-demo/versions")
     v1_id = resp.json()[0]["id"]
 
-    # v2 — emoji-rich, high-energy style
-    resp = await api.post(f"/prompts/{PROMPT_SLUG}/versions", json={
+    # Create v2 (empathetic)
+    resp = await api.post("/prompts/ticket-response-demo/versions", json={
         "body": (
-            "✨ {hook} ✨\n\n"
-            "🔥 {body} 🔥\n\n"
-            "💬 Comment your thoughts below!\n"
-            "❤️ Save this for later\n"
-            "👉 Link in bio\n\n"
-            "#instagood #{niche} #{brand} #viral #explore #trending"
+            "Hi {customer_name},\n\n"
+            "I completely understand how frustrating this must be, and I'm truly sorry "
+            "you're experiencing this issue with {issue_summary}.\n\n"
+            "I'm personally looking into this right now and will make sure we get it "
+            "sorted out for you as quickly as possible.\n\n"
+            "I'll follow up with you within 24 hours — sooner if I can. "
+            "Your ticket reference is {ticket_id}.\n\n"
+            "Thank you for your patience,\n{company} Support"
         ),
     })
     v2_id = resp.json()["id"]
-    print(f"  v2 (emoji-rich): {v2_id}")
+    print(f"  v2 (empathetic): {v2_id}")
 
     return {"prompt_id": prompt_id, "v1_id": v1_id, "v2_id": v2_id}
 
@@ -100,11 +97,11 @@ async def create_experiment(api: httpx.AsyncClient, ids: dict) -> str:
     print("=" * 60)
 
     resp = await api.post("/experiments", json={
-        "prompt_slug": PROMPT_SLUG,
-        "name": "minimal-vs-emoji-rich",
+        "prompt_slug": "ticket-response-demo",
+        "name": "scripted-vs-empathetic",
         "arms": [
-            {"version_id": ids["v1_id"], "weight": 50, "label": "minimal"},
-            {"version_id": ids["v2_id"], "weight": 50, "label": "emoji-rich"},
+            {"version_id": ids["v1_id"], "weight": 50, "label": "scripted"},
+            {"version_id": ids["v2_id"], "weight": 50, "label": "empathetic"},
         ],
     })
     exp_id = resp.json()["id"]
@@ -122,39 +119,47 @@ async def run_agent_sessions(
     llm_config: LLMConfig,
     n_sessions: int = 6,
 ) -> None:
-    """Run the Instagram content agent N times with different sessions."""
+    """Run the support agent N times with different sessions."""
     print("\n" + "=" * 60)
     print(f"STEP 3: Run agent {n_sessions} times (routed by experiment)")
     print("=" * 60)
 
     tools = create_prompt_manager_tools(client)
-    agent = MarketingContentAgent()
+    agent = CustomerSupportAgent()
+
+    scenarios = [
+        "account locked after password reset",
+        "billing charge they don't recognise",
+        "feature not working as documented",
+        "data export failed mid-way",
+        "account locked after password reset",
+        "slow response times on the platform",
+    ]
 
     for i in range(n_sessions):
-        session_id = f"creator-{i}"
-        print(f"\n  --- Session: {session_id} ---")
+        session_id = f"support-user-{i}"
+        issue = scenarios[i % len(scenarios)]
+        print(f"\n  --- Session: {session_id} ({issue}) ---")
 
         result = await agent.run(
             input=(
-                f"Generate an Instagram post caption for session '{session_id}'. "
-                f"Use resolve_prompt with slug='{PROMPT_SLUG}' and session_id='{session_id}'. "
-                "Fill in variables: hook='Your morning routine is wrong', "
-                "body='Here are 3 habits that changed everything for me', "
-                "call_to_action='Save this post and try it tomorrow', "
-                "niche='wellness', brand='dailyrise'. "
-                "Rate it with rate_content using content_type='caption'. "
-                "Report the engagement_rate metric with report_metric."
+                f"Customer {session_id} has an issue: {issue}. "
+                f"Use resolve_prompt with slug='ticket-response-demo' "
+                f"and session_id='{session_id}'. "
+                "Generate a support response from the template. "
+                "Rate it with rate_response (scenario_type='ticket'). "
+                "Report csat_score, tone_score, and resolution_score with report_metric."
             ),
             llm_config=llm_config,
             tools=tools,
         )
 
-        # Detect which version was served
+        # Detect which version was routed
         version_hint = "v?"
-        if "✨" in result.content or "🔥" in result.content or "#viral" in result.content:
-            version_hint = "v2 (emoji-rich)"
-        elif "#wellness" in result.content or "👇" in result.content:
-            version_hint = "v1 (minimal)"
+        if "investigate" in result.content.lower() and "business hours" in result.content.lower():
+            version_hint = "v1 (scripted)"
+        elif "understand" in result.content.lower() or "frustrating" in result.content.lower():
+            version_hint = "v2 (empathetic)"
 
         content_preview = result.content[:100].replace("\n", " ")
         print(f"  Routed to: {version_hint}")
@@ -166,29 +171,33 @@ async def run_agent_sessions(
 
 
 async def check_metrics(api: httpx.AsyncClient, prompt_id: str) -> dict:
-    """Check collected engagement_rate metrics per version."""
+    """Check collected metrics per version."""
     print("\n" + "=" * 60)
-    print("STEP 4: Check engagement_rate metrics per version")
+    print("STEP 4: Check metrics per version")
     print("=" * 60)
 
-    resp = await api.get(
-        f"/metrics/aggregate?prompt_id={prompt_id}&metric_name=engagement_rate"
-    )
-    metrics = resp.json()
-
-    # Get version numbers for display
-    resp = await api.get(f"/prompts/{PROMPT_SLUG}/versions")
-    versions = {v["id"]: v["version"] for v in resp.json()}
-
-    for m in metrics:
-        v_num = versions.get(m["version_id"], "?")
-        print(
-            f"  v{v_num}: count={m['count']}, "
-            f"mean={m['mean']:.2f}, "
-            f"min={m['min_val']:.1f}, max={m['max_val']:.1f}"
+    all_metrics = {}
+    for metric_name in ["csat_score", "tone_score", "resolution_score"]:
+        resp = await api.get(
+            f"/metrics/aggregate?prompt_id={prompt_id}&metric_name={metric_name}"
         )
+        metrics = resp.json()
 
-    return {m["version_id"]: m for m in metrics}
+        resp = await api.get("/prompts/ticket-response-demo/versions")
+        versions = {v["id"]: v["version"] for v in resp.json()}
+
+        print(f"\n  {metric_name}:")
+        for m in metrics:
+            v_num = versions.get(m["version_id"], "?")
+            print(
+                f"    v{v_num}: count={m['count']}, "
+                f"mean={m['mean']:.2f}, "
+                f"min={m['min_val']:.1f}, max={m['max_val']:.1f}"
+            )
+            all_metrics[m["version_id"]] = all_metrics.get(m["version_id"], {})
+            all_metrics[m["version_id"]][metric_name] = m
+
+    return all_metrics
 
 
 async def run_autoresearcher(
@@ -198,9 +207,9 @@ async def run_autoresearcher(
     ids: dict,
     exp_id: str,
 ) -> None:
-    """Run the autoresearcher to propose and deploy an improved caption version."""
+    """Run the autoresearcher to propose and deploy an improved version."""
     print("\n" + "=" * 60)
-    print("STEP 5: Autoresearcher proposes improved Instagram caption version")
+    print("STEP 5: Autoresearcher proposes improved version")
     print("=" * 60)
 
     from autoresearcher_shonku import AutoResearcherAgent
@@ -218,7 +227,7 @@ async def run_autoresearcher(
         })
 
     async def get_metrics(
-        prompt_id: str, version_id: str, metric_name: str = "engagement_rate"
+        prompt_id: str, version_id: str, metric_name: str = "csat_score"
     ) -> str:
         resp = await api.get(
             f"/metrics/aggregate?prompt_id={prompt_id}&metric_name={metric_name}"
@@ -228,13 +237,13 @@ async def run_autoresearcher(
     async def get_sample_interactions(
         prompt_id: str, limit: str = "3"
     ) -> str:
-        resp = await api.get(f"/prompts/{PROMPT_SLUG}/versions")
+        resp = await api.get("/prompts/ticket-response-demo/versions")
         versions = resp.json()
         samples = []
         for v in versions:
             samples.append({
                 "version": v["version"],
-                "body": v["body"][:100],
+                "body": v["body"][:120],
                 "source": v.get("source", "manual"),
             })
         return json.dumps(samples)
@@ -257,19 +266,19 @@ async def run_autoresearcher(
             f"/experiments/{exp_id}/status",
             json={"status": "concluded"},
         )
-        # Create new 3-arm experiment
-        resp = await api.get(f"/prompts/{PROMPT_SLUG}/versions")
+        # Create new experiment with 3 arms
+        resp = await api.get("/prompts/ticket-response-demo/versions")
         versions = resp.json()
         v1 = versions[0]["id"]
         v2 = versions[1]["id"]
         arms = [
-            {"version_id": v1, "weight": 30, "label": "minimal"},
-            {"version_id": v2, "weight": 30, "label": "emoji-rich"},
+            {"version_id": v1, "weight": 30, "label": "scripted"},
+            {"version_id": v2, "weight": 30, "label": "empathetic"},
             {"version_id": new_version_id, "weight": 40, "label": "optimized"},
         ]
         resp = await api.post("/experiments", json={
-            "prompt_slug": PROMPT_SLUG,
-            "name": "optimized-routing",
+            "prompt_slug": "ticket-response-demo",
+            "name": "optimized-support-routing",
             "arms": arms,
         })
         new_exp = resp.json()
@@ -295,7 +304,7 @@ async def run_autoresearcher(
 
     ar_tools = [
         ToolSpec(name="get_prompt", description="Get prompt by slug", callable=get_prompt),
-        ToolSpec(name="get_metrics", description="Get engagement metrics", callable=get_metrics),
+        ToolSpec(name="get_metrics", description="Get metrics", callable=get_metrics),
         ToolSpec(
             name="get_sample_interactions",
             description="Get sample versions",
@@ -321,13 +330,11 @@ async def run_autoresearcher(
     agent = AutoResearcherAgent()
     result = await agent.run(
         input=(
-            f"Analyze the '{PROMPT_SLUG}' Instagram caption prompt. "
-            "There are 2 versions: v1 (minimal, clean) and v2 (emoji-rich, high-energy). "
-            "Metrics show both score around 7-8/10 engagement_rate. "
-            "Create a NEW v3 that combines the best of both: "
-            "uses 1-2 strategic emojis, a strong scroll-stopping hook, "
-            "a single clear CTA ('save this' or 'link in bio'), "
-            "and 5-8 niche hashtags instead of generic viral ones. "
+            "Analyze the 'ticket-response-demo' prompt. There are 2 versions: "
+            "v1 (scripted, formal, impersonal) and v2 (empathetic, warm, personalised). "
+            "CSAT metrics show v2 scores higher on tone but v1 is slightly clearer on next steps. "
+            "Create a NEW v3 that combines the best of both: empathetic opening, "
+            "clear resolution steps, and a specific follow-up commitment. "
             "Then deploy a new experiment with v1=30%, v2=30%, v3=40%. "
             "Use the tools provided. Do NOT invent tool names."
         ),
@@ -340,7 +347,7 @@ async def run_autoresearcher(
     print(f"  Summary: {result.content[:300]}")
 
     # Show what versions exist now
-    resp = await api.get(f"/prompts/{PROMPT_SLUG}/versions")
+    resp = await api.get("/prompts/ticket-response-demo/versions")
     versions = resp.json()
     print(f"\n  Versions after optimization: {len(versions)}")
     for v in versions:
@@ -353,16 +360,16 @@ async def verify_new_routing(
     client: PromptManagerClient,
     llm_config: LLMConfig,
 ) -> None:
-    """Run agent again to verify routing includes the optimized v3."""
+    """Run agent again to see it get routed to the new version."""
     print("\n" + "=" * 60)
     print("STEP 6: Verify new routing includes optimized version")
     print("=" * 60)
 
     versions_seen = set()
     for i in range(6):
-        session_id = f"verify-creator-{i}"
+        session_id = f"verify-user-{i}"
         resp = await client._client.get(
-            f"/resolve/{PROMPT_SLUG}?session_id={session_id}"
+            f"/resolve/ticket-response-demo?session_id={session_id}"
         )
         data = resp.json()
         versions_seen.add(data["version"])
@@ -375,7 +382,7 @@ async def verify_new_routing(
 
 async def main():
     print("=" * 60)
-    print("  FULL LOOP DEMO: Instagram Content Autoresearch")
+    print("  FULL LOOP DEMO: Support Agent — Autoresearch Prompt Manager")
     print("  Model: Groq gpt-oss-120b")
     print("=" * 60)
 

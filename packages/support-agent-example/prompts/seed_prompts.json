@@ -1,0 +1,30 @@
+[
+    {
+        "slug": "ticket-response",
+        "name": "Ticket Response",
+        "description": "General customer support ticket response template",
+        "content": "Hi {{customer_name}},\n\nThank you for reaching out to {{company}} support.\n\nI understand you're experiencing: {{issue_summary}}\n\nHere's what I'm doing to help:\n1. {{action_step_1}}\n2. {{action_step_2}}\n\nI'll follow up with you within {{response_time}}. Your reference number is {{ticket_id}}.\n\nPlease don't hesitate to reply if you have any questions in the meantime.\n\nBest,\n{{agent_name}}\n{{company}} Support",
+        "tags": ["support", "ticket", "general"]
+    },
+    {
+        "slug": "faq-answer",
+        "name": "FAQ Answer",
+        "description": "Template for answering frequently asked questions",
+        "content": "Hi {{customer_name}},\n\nGreat question! Here's everything you need to know about {{topic}}:\n\n{{answer_body}}\n\nFor more details, you can also check out our help article: {{help_article_url}}\n\nIf this doesn't fully answer your question, feel free to reply and I'll be happy to help further.\n\nBest,\n{{company}} Support Team",
+        "tags": ["support", "faq", "self-service"]
+    },
+    {
+        "slug": "escalation-decision",
+        "name": "Escalation Notice",
+        "description": "Template for communicating an escalation to a higher-tier team",
+        "content": "Hi {{customer_name}},\n\nThank you for your patience while we've been looking into your issue with {{issue_summary}}.\n\nGiven the complexity of your situation, I'm escalating this to our {{escalation_team}} team who have the specialised expertise to resolve this for you.\n\nWhat happens next:\n- Our {{escalation_team}} team will contact you within {{escalation_sla}}\n- Your case reference is {{ticket_id}} — please keep this handy\n- You can reach us at any time by replying to this message\n\nWe sincerely apologise for the inconvenience and appreciate your patience.\n\nWarm regards,\n{{agent_name}}\n{{company}} Support",
+        "tags": ["support", "escalation", "tier2"]
+    },
+    {
+        "slug": "sentiment-handling",
+        "name": "Frustrated Customer Response",
+        "description": "Template for handling upset or frustrated customers with empathy",
+        "content": "Hi {{customer_name}},\n\nI sincerely apologise for the experience you've had with {{issue_summary}}. I completely understand your frustration, and I want you to know that your concerns are completely valid.\n\nThis is not the experience we want for our customers, and I take full ownership of making this right for you.\n\nHere is exactly what I am going to do:\n{{resolution_steps}}\n\nI will personally follow up with you by {{follow_up_time}} to confirm everything has been resolved to your satisfaction.\n\nAgain, I am truly sorry for the trouble this has caused. Thank you for giving us the opportunity to make this right.\n\nSincerely,\n{{agent_name}}\n{{company}} Customer Success",
+        "tags": ["support", "empathy", "retention", "sentiment"]
+    }
+]

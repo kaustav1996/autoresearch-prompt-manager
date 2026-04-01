@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "marketing-agent-example"
-version = "0.1.5"
-description = "Example marketing content agent demonstrating the full prompt-manager stack"
+name = "support-agent-example"
+version = "0.1.0"
+description = "Example customer support agent demonstrating the full prompt-manager stack"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
@@ -19,7 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-keywords = ["prompt", "marketing", "agents", "example", "autoresearch"]
+keywords = ["prompt", "support", "agents", "example", "autoresearch"]
 dependencies = [
     "shonku>=0.1.0",
     "autoresearcher-shonku>=0.1.0",
@@ -34,12 +34,11 @@ Repository = "https://github.com/kaustav1996/autoresearch-prompt-manager"
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
 
 [project.scripts]
-arpm-example = "marketing_agent.cli:main"
+arpm-support = "support_agent.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/marketing_agent"]
+packages = ["src/support_agent"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-pythonpath = ["src"]
